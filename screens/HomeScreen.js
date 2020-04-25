@@ -1,14 +1,44 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Dimensions} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+
+import { Searchbar } from 'react-native-paper';
+import MapView,{ Marker, Callout }  from 'react-native-maps';
 
 import { MonoText } from '../components/StyledText';
 
 export default function HomeScreen() {
+  const [searchString, SetSearchString] = React.useState (null);
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={{backgroundColor: '#333', height: 150}}>
+
+      </View>
+      <Searchbar
+        placeholder="Search"
+        onChangeText={SetSearchString}
+        value={searchString}
+      />
+      <MapView
+      region={{
+        latitude: 53.22683,
+        longitude: -0.53792,
+        latitudeDelta: 0.15,
+        longitudeDelta: 0.15       
+      }}
+      style={styles.mapStyle}>
+        <Marker
+        coordinate ={{latitude: 53.57905, longitude: -0.65437}}
+        title={'Scunthorpe'}>  
+
+        <Callout>
+          <Text>Home Town</Text>
+        </Callout>  
+        </Marker>
+      </MapView>
+      
+      {/* <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.welcomeContainer}>
           <Image
             source={
@@ -39,15 +69,15 @@ export default function HomeScreen() {
             <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </ScrollView> */}
 
-      <View style={styles.tabBarInfoContainer}>
+      {/* <View style={styles.tabBarInfoContainer}>
         <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
 
         <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
           <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -90,9 +120,15 @@ function handleHelpPress() {
 }
 
 const styles = StyleSheet.create({
+  mapStyle: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   developmentModeText: {
     marginBottom: 20,
