@@ -4,6 +4,9 @@ import * as React from 'react';
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
+import UploadImage from '../screens/UploadImage';
+//import UploadImage from '../screens/UploadImage';
+import { Button } from 'react-native-paper';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -20,18 +23,26 @@ export default function BottomTabNavigator({ navigation, route }) {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'Get Started',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
+          title: 'Map',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-map" />,
         }}
       />
+        <BottomTab.Screen
+        name="Upload"
+        component={UploadImage}
+        options={{
+        title: 'Add',
+        tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-add-circle-outline" />,
+        }}
+      />   
       <BottomTab.Screen
         name="Links"
         component={LinksScreen}
         options={{
-          title: 'Resources',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
+          title: 'Favourites',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-star-outline" />,
         }}
-      />
+      />       
     </BottomTab.Navigator>
   );
 }
@@ -41,8 +52,10 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
-      return 'How to get started';
+      return 'Picture Maps';
     case 'Links':
-      return 'Links to learn more';
+      return 'Favourite Locations';
+    case 'Upload':
+      return 'Add your own Picture Location'
   }
 }

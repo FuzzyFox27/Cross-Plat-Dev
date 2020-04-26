@@ -8,7 +8,7 @@ export default function LinksScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <OptionButton
-        icon="md-school"
+        icon="ios-camera"
         label="Read the Expo documentation"
         onPress={() => WebBrowser.openBrowserAsync('https://docs.expo.io')}
       />

@@ -2,24 +2,24 @@ import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Dimensions} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-
+import Svg, {image} from 'react-native-svg';
 import { Searchbar } from 'react-native-paper';
 import MapView,{ Marker, Callout }  from 'react-native-maps';
-
 import { MonoText } from '../components/StyledText';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default function HomeScreen() {
   const [searchString, SetSearchString] = React.useState (null);
   return (
     <View style={styles.container}>
-      <View style={{backgroundColor: '#333', height: 150}}>
-
-      </View>
+      <GooglePlacesAutocomplete>
+      <View style={{backgroundColor: '#333', height: 150}}></View>
       <Searchbar
         placeholder="Search"
         onChangeText={SetSearchString}
         value={searchString}
       />
+      
       <MapView
       region={{
         latitude: 53.22683,
@@ -29,14 +29,20 @@ export default function HomeScreen() {
       }}
       style={styles.mapStyle}>
         <Marker
-        coordinate ={{latitude: 53.57905, longitude: -0.65437}}
+        coordinate ={{latitude: 53.22683, longitude: -0.53792}}
         title={'Scunthorpe'}>  
 
         <Callout>
-          <Text>Home Town</Text>
+          <Text>Chimken</Text>
+          <Text> <Image style={{ width: 20, height: 20, backgroundColor: '#333' }} source={require('../TestPhotos/pic1.jpg')} /> </Text>
+          <Image
+            style={{ width: 50, height: 50, backgroundColor: '#333' }}
+            source={require('../TestPhotos/pic1.jpg')}
+          />
         </Callout>  
         </Marker>
       </MapView>
+
       
       {/* <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.welcomeContainer}>
@@ -78,6 +84,7 @@ export default function HomeScreen() {
           <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
         </View>
       </View> */}
+      </GooglePlacesAutocomplete>
     </View>
   );
 }
