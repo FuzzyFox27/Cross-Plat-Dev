@@ -1,4 +1,4 @@
-import React from 'react';
+import React from './node_modules/react';
 import { View } from 'react-native';
 import MapInput from '../components/MapInput';
 import MyMapView from '../components/MapView';

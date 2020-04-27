@@ -6,10 +6,25 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import MapView,{ Marker, Callout }  from 'react-native-maps';
+import * as Location from 'expo-location';
+import Geocoder from 'react-native-geocoding';
+
+Geocoder.init("AIzaSyCFwDieIrvE0plAgln7Cv07lbpUcazKyKI");
+
+//Geocoder.from("Lincoln, United Kingdom")
+  //      .then(json => {
+    //        var location = json.results[0].geometry.location;
+      //      console.log(location);
+        //})
+        //.catch(error => console.warn(error));
 
 export default class UploadImage extends React.Component {
   state = {
     image: null,
+    Descrpytion: 'a very nice photo',
+    location: null,
+    inProgress: false,
   };
 
 render(){
@@ -23,15 +38,42 @@ render(){
         <TextInput  
           style={{height: 100, width: 390,backgroundColor: 'white', fontSize: 11}}  
           placeholder=""  
-          onChangeText={(text) => this.setState({text})}  
+          onChangeText={(typedText) => this.setState({Descrpytion: typedText})}           
         /> 
-        <Button title="Upload"/>
+        <Text>Where was the photo taken</Text>
+        <TextInput  
+          style={{height: 100, width: 390,backgroundColor: 'white', fontSize: 11}}  
+          placeholder=""  
+          onChangeText={(typedText) => this.setState({location: typedText})}           
+        /> 
+        <Text>{this.state.Descrpytion}</Text>
+        <Button title="Upload" onPress={this._getLocationAsync}/>
+        </View>
+        <View>
+          
         </View>
   </View>
   );
 }
+
+_getLocationAsync = async () => {
+  let { status } = await Permissions.askAsync(Permissions.LOCATION);
+  if (status !== 'granted') {
+    this.setState({
+      errorMessage: 'Permission to access location was denied',
+    });
+  }
+  Geocoder.from(this.state.location)
+        .then(json => {
+            var location = json.results[0].geometry.location;
+            console.log(location);
+        })
+        .catch(error => console.warn(error));
+};
+
 componentDidMount() {
   this.getPermissionAsync();
+  Permissions.askAsync(Permissions.LOCATION);
 }
 
 getPermissionAsync = async () => {
