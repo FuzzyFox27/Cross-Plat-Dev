@@ -1,52 +1,170 @@
 import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Dimensions} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Dimensions, Button } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, {image} from 'react-native-svg';
-import { Searchbar } from 'react-native-paper';
-import MapView,{ Marker, Callout }  from 'react-native-maps';
+import { Searchbar, TextInput } from 'react-native-paper';
+import MapView,{ Marker, Callout, PROVIDER_GOOGLE }  from 'react-native-maps';
 import { MonoText } from '../components/StyledText';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import * as Location from 'expo-location';
+import * as ExpoLocation from 'expo-location';
 import Geocoder from 'react-native-geocoding';
+import { Ionicons } from '@expo/vector-icons';
 
 Geocoder.init("AIzaSyCFwDieIrvE0plAgln7Cv07lbpUcazKyKI");
 
 export default function HomeScreen() {
-  const [searchString, SetSearchString, location] = React.useState (null);
+  const [searchString, SetSearchString] = useState (null);
+  const [location, SetLocation] = useState({
+    latitude: 53.22683,
+    longitude: -0.53792,
+    latitudeDelta: 0.15,
+    longitudeDelta: 0.15       
+  });
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  const getLocation = () => {
+    (async () => {
+      let { status } = await ExpoLocation.requestPermissionsAsync();
+      if (status !== 'granted') {
+        // setErrorMsg('Permission to access location was denied');
+      }
+
+      let newlocation = await ExpoLocation.getCurrentPositionAsync({});
+      console.log(newlocation)
+      SetLocation({
+        ...location,
+        latitude: newlocation.coords.latitude,
+        longitude: newlocation.coords.longitude
+      })
+      // SetLocation(newlocation);
+    })();
+  }
+
+  const onSearch = () => {
+    console.log("Search Text =>", searchString)
+
+    Geocoder.from(searchString)
+    .then(json => {
+        let geocoderLocation = json.results[0].geometry.location;
+        // console.log("searchString =>", searchString)
+        console.log(geocoderLocation);
+        SetLocation({
+          latitude: geocoderLocation.lat,
+          longitude: geocoderLocation.lng,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15       
+        });
+    })
+    .catch(error => console.warn(error));
+
+  }
+
   return (
     <View style={styles.container}>
-      <GooglePlacesAutocomplete>
-      <View style={{backgroundColor: '#333', height: 150}}></View>
-      <Searchbar
-        placeholder="Search"
-        onChangeText={SetSearchString}
-        value={searchString}
-      />
-      
-      <MapView
-      region={{
-        latitude: 53.22683,
-        longitude: -0.53792,
-        latitudeDelta: 0.15,
-        longitudeDelta: 0.15       
+      <View style={{flexDirection: 'row'}}>
+        <TextInput value={searchString} onChangeText={SetSearchString} style={{width: '68%'}} placeholder="Location" />
+        <Button onPress={onSearch} style={{width: '15%'}} title="Search " />
+        <Ionicons style = {{alignItems:'center'}} onPress={getLocation} name = "ios-locate" size = {70}/>
+      </View>
+      <GooglePlacesAutocomplete      query={{
+        // available options: https://developers.google.com/places/web-service/autocomplete
+        key: 'AIzaSyCFwDieIrvE0plAgln7Cv07lbpUcazKyKI',
+        language: 'en', // language of the results
+        types: '(cities)', // default: 'geocode'
+      }}GooglePlacesSearchQuery={{
+        rankby: 'distance',
+        type: 'cafe'
       }}
+      autoFocus={false}
+      fetchDetails={true}
+      renderDescription={row => row.description}
+      onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+      console.log(data, details);
+    }}
+      currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+      currentLocationLabel="Current location"
+      onChangeText={(typedText) => this.setState({location: typedText})}  
+      >
+      <MapView
+      region={location}
+      provider={PROVIDER_GOOGLE}
       style={styles.mapStyle}>
         <Marker
-        coordinate ={{latitude: 53.22683, longitude: -0.53792}}
-        title={'Scunthorpe'}>  
+        coordinate ={{latitude: 53.2343, longitude: -0.5360}}
+        >  
 
         <Callout>
-          <Text>Chimken</Text>
-          <Text> <Image style={{ width: 20, height: 20, backgroundColor: '#333' }} source={require('../TestPhotos/pic1.jpg')} /> </Text>
-          <Image
-            style={{ width: 50, height: 50, backgroundColor: '#333' }}
-            source={require('../TestPhotos/pic1.jpg')}
-          />
+          <View style = {styles.Marker}>
+          <Text>Lincoln, Cathedral</Text>
+          <View style = {{flexDirection: "row"}}>
+            <Text> <Image style={{ width: 60, height: 60, backgroundColor: '#333' }} source={require('../TestPhotos/pic3.jpg')} /> </Text>
+            <Text style = {styles.description}>was taken at dinnertime in april at the front gate</Text>
+          </View>
+          </View>
+        </Callout>  
+        </Marker>
+        <Marker
+        coordinate ={{latitude: 53.22683, longitude: -0.53792}}
+        >  
+
+        <Callout>
+          <View style = {styles.Marker}>
+          <Text>Lincoln, Train Bridge</Text>
+          <View style = {{flexDirection: "row"}}>
+            <Text> <Image style={{ width: 60, height: 60, backgroundColor: '#333' }} source={require('../TestPhotos/pic2.jpg')} /> </Text>
+            <Text style = {styles.description}>This Picture was taken at night overlooking the train brige. Using a f/1.2 50mm lens</Text>
+          </View>
+          </View>
+        </Callout>  
+        </Marker>
+        <Marker
+        coordinate ={{latitude: 53.2318, longitude: -0.5251}}
+        >  
+
+        <Callout>
+          <View style = {styles.Marker}>
+          <Text>Lincoln, Arbatreum</Text>
+          <View style = {{flexDirection: "row"}}>
+            <Text> <Image style={{ width: 60, height: 60, backgroundColor: '#333' }} source={require('../TestPhotos/pic1.jpg')} /> </Text>
+            <Text style = {styles.description}>was taken at dinnertime in april at the front gate</Text>
+          </View>
+          </View>
+        </Callout>  
+        </Marker>
+        <Marker
+        coordinate ={{latitude: 53.2288, longitude: -0.5459}}
+        >  
+
+        <Callout>
+          <View style = {styles.Marker}>
+          <Text>Lincoln, Brayford</Text>
+          <View style = {{flexDirection: "row"}}>
+            <Text> <Image style={{ width: 60, height: 60, backgroundColor: '#333' }} source={require('../TestPhotos/pic4.jpg')} /> </Text>
+            <Text style = {styles.description}>Taken at 7pm, may, with a canon 80D</Text>
+          </View>
+          </View>
+        </Callout>  
+        </Marker>
+        <Marker
+        coordinate ={{latitude: 53.3401, longitude: 0.2673}}
+        >  
+
+        <Callout>
+          <View style = {styles.Marker}>
+          <Text>MableThorpe, Sea Front</Text>
+          <View style = {{flexDirection: "row"}}>
+            <Text> <Image style={{ width: 60, height: 60, backgroundColor: '#333' }} source={require('../TestPhotos/pic5.jpg')} /> </Text>
+            <Text style = {styles.description}>quite windy but worth the picture</Text>
+          </View>
+          </View>
         </Callout>  
         </Marker>
       </MapView>
       </GooglePlacesAutocomplete>
+      {/* <TextInput placeholder = "Search" style = {styles.Searchbar}/> */}
     </View>
   );
 }
@@ -96,11 +214,7 @@ function handleLearnMorePress() {
   WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
 }
 
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-  );
-}
+
 
 const styles = StyleSheet.create({
   mapStyle: {
@@ -113,86 +227,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  Searchbar: {
+    flex: 1,
   },
-  contentContainer: {
-    paddingTop: 30,
+  Marker:{
+    flex: 1,
+    backgroundColor: 'white',
+    width: 350,
+    height: 100,
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
+  DescryptionText:{
+    fontSize: 10,
+
   },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  Icon:{
+
+
   },
 });

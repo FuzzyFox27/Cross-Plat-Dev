@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "HelloWorld",
+    "name": "WhereAbouts",
     "slug": "ReactNavigation",
     "platforms": [
       "ios",
@@ -24,6 +24,8 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "sdkVersion": "37.0.0",
+    "description": "an app for photographers and hobbyists ti find the best photo locations"
   }
 }
